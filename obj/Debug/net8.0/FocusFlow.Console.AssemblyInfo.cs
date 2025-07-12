@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("FocusFlow.Console")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+b6eb717ec696e2e9d9d99736f7fe60796f471690")]
 [assembly: System.Reflection.AssemblyProductAttribute("FocusFlow.Console")]
 [assembly: System.Reflection.AssemblyTitleAttribute("FocusFlow.Console")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

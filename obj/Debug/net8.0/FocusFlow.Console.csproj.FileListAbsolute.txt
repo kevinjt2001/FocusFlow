@@ -12,3 +12,4 @@
 /Users/kevintorrealba/FocusFlow.Console/obj/Debug/net8.0/FocusFlow.Console.pdb
 /Users/kevintorrealba/FocusFlow.Console/obj/Debug/net8.0/FocusFlow.Console.genruntimeconfig.cache
 /Users/kevintorrealba/FocusFlow.Console/obj/Debug/net8.0/ref/FocusFlow.Console.dll
+/Users/kevintorrealba/FocusFlow.Console/obj/Debug/net8.0/FocusFlow.Console.sourcelink.json
