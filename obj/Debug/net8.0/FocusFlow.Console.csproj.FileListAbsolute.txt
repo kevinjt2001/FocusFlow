@@ -1,0 +1,15 @@
+/Users/kevintorrealba/FocusFlow.Console/bin/Debug/net8.0/FocusFlow.Console
+/Users/kevintorrealba/FocusFlow.Console/bin/Debug/net8.0/FocusFlow.Console.deps.json
+/Users/kevintorrealba/FocusFlow.Console/bin/Debug/net8.0/FocusFlow.Console.runtimeconfig.json
+/Users/kevintorrealba/FocusFlow.Console/bin/Debug/net8.0/FocusFlow.Console.dll
+/Users/kevintorrealba/FocusFlow.Console/bin/Debug/net8.0/FocusFlow.Console.pdb
+/Users/kevintorrealba/FocusFlow.Console/obj/Debug/net8.0/FocusFlow.Console.GeneratedMSBuildEditorConfig.editorconfig
+/Users/kevintorrealba/FocusFlow.Console/obj/Debug/net8.0/FocusFlow.Console.AssemblyInfoInputs.cache
+/Users/kevintorrealba/FocusFlow.Console/obj/Debug/net8.0/FocusFlow.Console.AssemblyInfo.cs
+/Users/kevintorrealba/FocusFlow.Console/obj/Debug/net8.0/FocusFlow.Console.csproj.CoreCompileInputs.cache
+/Users/kevintorrealba/FocusFlow.Console/obj/Debug/net8.0/FocusFlow.Console.dll
+/Users/kevintorrealba/FocusFlow.Console/obj/Debug/net8.0/refint/FocusFlow.Console.dll
+/Users/kevintorrealba/FocusFlow.Console/obj/Debug/net8.0/FocusFlow.Console.pdb
+/Users/kevintorrealba/FocusFlow.Console/obj/Debug/net8.0/FocusFlow.Console.genruntimeconfig.cache
+/Users/kevintorrealba/FocusFlow.Console/obj/Debug/net8.0/ref/FocusFlow.Console.dll
+/Users/kevintorrealba/FocusFlow.Console/obj/Debug/net8.0/FocusFlow.Console.sourcelink.json
