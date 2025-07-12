@@ -1,0 +1,42 @@
+# Build output
+bin/
+obj/
+
+# JetBrains Rider
+.idea/
+
+# macOS system file
+.DS_Store
+
+# VS-related user settings (if ever used)
+*.user
+*.suo
+*.userprefs
+
+# NuGet
+*.nupkg
+*.snupkg
+*.nuspec
+*.psmdcp
+*.nupkg.sha512
+.nuget/
+packages/
+
+# Logs
+*.log
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+*.coveragexml
+
+# Cache
+*.cache
+
+# Others
+*.dll
+*.pdb
+*.tmp
+*.bak
+*.swp
