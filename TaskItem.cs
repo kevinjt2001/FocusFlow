@@ -2,17 +2,18 @@ namespace FocusFlow.Console;
 using System;
 public class TaskItem
 {
-    public string Title { get; set; }
+    public required string Title { get; set; }
     public string Description { get; set; } = "No description";
     public bool IsCompleted { get; set; }
     public static List<TaskItem> Tasks = new List<TaskItem>();
+    public DateTime? DueDate { get; set; }
 
     public static void AddTask()
     {
         Console.Write("Enter task title: ");
         string title = Console.ReadLine();
         
-        if (string.IsNullOrEmpty(title))
+        if (string.IsNullOrWhiteSpace(title))
         {
             Console.WriteLine("Task title may not be empty.");
         }
