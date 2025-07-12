@@ -15,7 +15,7 @@ public class TaskItem
         
         if (string.IsNullOrWhiteSpace(title))
         {
-            Console.WriteLine("Task title may not be empty.");
+            Console.WriteLine("\nTask title may not be empty.");
         }
         else
         {
@@ -51,7 +51,7 @@ public class TaskItem
     {
         if (Tasks.Count == 0)
         {
-            Console.WriteLine("No tasks found.");
+            Console.WriteLine("\nNo tasks found.");
         }
         else
         {
@@ -62,11 +62,33 @@ public class TaskItem
             }
             else
             {
-                Console.WriteLine("Invalid task number. Please try again.");
+                Console.WriteLine("\nInvalid task number. Please try again.");
             }
         }
-        
-
     }
+
+    public static void DeleteTask()
+    {
+        if (Tasks.Count == 0)
+        {
+            Console.WriteLine("\nNo tasks found.");
+        }
+        else
+        {
+            Console.Write("Enter task number to delete: ");
+            if (int.TryParse(Console.ReadLine(), out int index) && index >= 1 && index <= Tasks.Count)
+            {
+                var deletdedTask = Tasks[index - 1];
+                Tasks.RemoveAt(index - 1);
+                Console.WriteLine($"Task deleted: {deletdedTask.Title}");
+            }
+            else
+            {
+                Console.WriteLine("\nInvalid task number. Please try again.");
+            }
+        }
+        DataManager.SaveTasks(Tasks);
+    }
+    
     
 }
