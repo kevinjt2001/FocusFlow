@@ -17,7 +17,7 @@ public class UI
         while (true)
         {
             Console.WriteLine("Welcome to FocusFlow!\n");
-            TaskItem.ShowTasks();
+            TaskManager.ShowTasks();
             PrintMenu();
             
             var userInput = Console.ReadLine()?.Trim();
@@ -25,13 +25,13 @@ public class UI
             switch (userInput)
             {
                 case "1":
-                    TaskItem.AddTask();
+                    TaskManager.AddTask();
                     break;
                 case "2":
-                    TaskItem.CompleteTask();
+                    TaskManager.CompleteTask();
                     break;
                 case "3":
-                    TaskItem.DeleteTask();
+                    TaskManager.DeleteTask();
                     break;
                 case "4":
                     Console.Write("\nGoodbye!");
