@@ -5,9 +5,9 @@
     {
         public static void Main(string[] args)
         {
-            TaskManager.Tasks = DataManager.LoadTasks();
+            //TaskManager.Tasks = DataManager.LoadTasks();
             UI.Loop();
-            DataManager.SaveTasks(TaskManager.Tasks);
+           // DataManager.SaveTasks(TaskManager.Tasks);
             
         }
     }
