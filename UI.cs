@@ -14,10 +14,11 @@ public class UI
 
     public static void Loop()
     {
+        TaskManager tm = new TaskManager();
         while (true)
         {
             Console.WriteLine("Welcome to FocusFlow!\n");
-            TaskManager.ShowTasks();
+            tm.ShowTasks();
             PrintMenu();
             
             var userInput = Console.ReadLine()?.Trim();
@@ -25,13 +26,13 @@ public class UI
             switch (userInput)
             {
                 case "1":
-                    TaskManager.AddTask();
+                    tm.AddTask();
                     break;
                 case "2":
-                    TaskManager.CompleteTask();
+                    tm.CompleteTask();
                     break;
                 case "3":
-                    TaskManager.DeleteTask();
+                    tm.DeleteTask();
                     break;
                 case "4":
                     Console.Write("\nGoodbye!");
@@ -40,6 +41,8 @@ public class UI
                     Console.WriteLine("\nInvalid input. Please try again.");
                     break;
             }
+            DataManager.SaveTasks(tm.Tasks);
         }
+        
     }
 }

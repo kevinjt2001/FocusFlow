@@ -5,9 +5,13 @@ using System;
 
 public class TaskManager
 {
-    public static List<TaskItem> Tasks = new List<TaskItem>();
-    
-    public static void AddTask()
+    public List<TaskItem> Tasks { get; set; }
+
+    public TaskManager()
+    {
+        Tasks = DataManager.LoadTasks();
+    }
+    public void AddTask()
     {
         Console.Write("Enter task title: ");
         string title = Console.ReadLine();
@@ -49,7 +53,7 @@ public class TaskManager
         }
     }
 
-    public static void ShowTasks()
+    public void ShowTasks()
     {
         // Task display
         Console.WriteLine(" ---------  Tasks  ---------");
@@ -67,7 +71,7 @@ public class TaskManager
         Console.WriteLine();
     }
 
-    public static void CompleteTask()
+    public void CompleteTask()
     {
         if (Tasks.Count == 0)
         {
@@ -88,7 +92,7 @@ public class TaskManager
         }
     }
 
-    public static void DeleteTask()
+    public void DeleteTask()
     {
         if (Tasks.Count == 0)
         {
@@ -114,7 +118,7 @@ public class TaskManager
     }
     
     // Method to handle DueDate
-    public static DateTime? ValidateDueDate(string userDate)
+    public DateTime? ValidateDueDate(string userDate)
     {
         // Handle user input for due date. Due date can be null 
         if (string.IsNullOrWhiteSpace(userDate))
