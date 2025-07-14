@@ -8,7 +8,8 @@ public class UI
         Console.WriteLine("  1. Add Task");
         Console.WriteLine("  2. Mark Task as Complete");
         Console.WriteLine("  3. Delete Task");
-        Console.WriteLine("  4. Exit Task Manager");
+        Console.WriteLine("  4. Edit Task");
+        Console.WriteLine("  5. Exit Task Manager");
         Console.Write("> ");
     }
 
@@ -34,6 +35,9 @@ public class UI
                     tm.DeleteTask();
                     break;
                 case "4":
+                    tm.EditTask();
+                    break;
+                case "5":
                     Console.Write("\nGoodbye!");
                     return; // exit 
                 default:
