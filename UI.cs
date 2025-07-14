@@ -9,18 +9,17 @@ public class UI
         Console.WriteLine("  2. Mark Task as Complete");
         Console.WriteLine("  3. Delete Task");
         Console.WriteLine("  4. Exit Task Manager");
-        Console.Write("~ ");
+        Console.Write("> ");
     }
 
     public static void Loop()
     {
+        Console.WriteLine("Welcome to FocusFlow!");
         TaskManager tm = new TaskManager();
         while (true)
         {
-            Console.WriteLine("Welcome to FocusFlow!\n");
             tm.ShowTasks();
             PrintMenu();
-            
             var userInput = Console.ReadLine()?.Trim();
             
             switch (userInput)

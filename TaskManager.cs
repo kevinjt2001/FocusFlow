@@ -11,10 +11,22 @@ public class TaskManager
     {
         Tasks = DataManager.LoadTasks();
     }
+
+    public bool CheckForTasks(string msg)
+    {
+        if (Tasks.Count == 0)
+        {
+            Console.WriteLine(msg);
+            //Console.WriteLine("No tasks found.");
+            return false;
+        }
+        return true;
+    }
+    
     public void AddTask()
     {
         Console.Write("Enter task title: ");
-        string title = Console.ReadLine();
+        string title = Console.ReadLine().Trim();
         
         // Verify title is not null/empty/whitespace. Title must hold a value
         if (string.IsNullOrWhiteSpace(title))
@@ -27,7 +39,7 @@ public class TaskManager
             TaskItem task = new TaskItem { Title = title };
             
             Console.Write("Enter task description (optional): ");
-            string description = Console.ReadLine();
+            string description = Console.ReadLine().Trim();
 
             // If user inputs a description, add it to the existing TaskItem. Description can be null/empty/whitespace
             if (!string.IsNullOrWhiteSpace(description))
@@ -51,14 +63,18 @@ public class TaskManager
             
             Tasks.Add(task);
         }
+        DataManager.SaveTasks(Tasks);
     }
 
     public void ShowTasks()
     {
         // Task display
-        Console.WriteLine(" ---------  Tasks  ---------");
-        if (Tasks.Count == 0)
-            Console.WriteLine("No tasks found.");
+        Console.WriteLine("\n---------  Tasks  ---------");
+        if (!CheckForTasks("No tasks yet."))
+        {
+            Console.WriteLine();
+            return;
+        }
         
         // Loop through tasks and display them
         for (int i = 0; i < Tasks.Count; i++)
@@ -73,48 +89,39 @@ public class TaskManager
 
     public void CompleteTask()
     {
-        if (Tasks.Count == 0)
+        if (!CheckForTasks("No tasks to complete.")) return;
+            
+        // Mark task complete by task number (index)
+        Console.Write("Enter task number to complete: ");
+        if (int.TryParse(Console.ReadLine(), out int index) && index >= 1 && index <= Tasks.Count)
         {
-            Console.WriteLine("\nNo tasks found.");
+            Tasks[index - 1].IsCompleted = true;
         }
         else
         {
-            // Mark task complete by task number (index)
-            Console.Write("Enter task number to complete: ");
-            if (int.TryParse(Console.ReadLine(), out int index) && index >= 1 && index <= Tasks.Count)
-            {
-                Tasks[index - 1].IsCompleted = true;
-            }
-            else
-            {
-                Console.WriteLine("\nInvalid task number. Please try again.");
-            }
+            Console.WriteLine("\nInvalid task number. Please try again.");
         }
+        DataManager.SaveTasks(Tasks);
     }
 
     public void DeleteTask()
     {
-        if (Tasks.Count == 0)
+        if (!CheckForTasks("No tasks to delete.")) return;
+        
+        // Delete task by number (index)
+        Console.Write("Enter task number to delete: ");
+        if (int.TryParse(Console.ReadLine(), out int index) && index >= 1 && index <= Tasks.Count)
         {
-            Console.WriteLine("\nNo tasks found.");
+            var deletedTask = Tasks[index - 1];
+            Tasks.RemoveAt(index - 1);
+            Console.WriteLine($"Task deleted: {deletedTask.Title}");
+            // Update tasks.json
+            DataManager.SaveTasks(Tasks);
         }
         else
         {
-            // Delete task by number (index)
-            Console.Write("Enter task number to delete: ");
-            if (int.TryParse(Console.ReadLine(), out int index) && index >= 1 && index <= Tasks.Count)
-            {
-                var deletdedTask = Tasks[index - 1];
-                Tasks.RemoveAt(index - 1);
-                Console.WriteLine($"Task deleted: {deletdedTask.Title}");
-            }
-            else
-            {
-                Console.WriteLine("\nInvalid task number. Please try again.");
-            }
+            Console.WriteLine("\nInvalid task number. Please try again.");
         }
-        // Update tasks.json
-        DataManager.SaveTasks(Tasks);
     }
     
     // Method to handle DueDate
@@ -135,4 +142,5 @@ public class TaskManager
         Console.WriteLine("\nInvalid date format");
         return null;
     }
+    
 }
