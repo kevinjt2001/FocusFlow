@@ -1,4 +1,5 @@
 using System.Globalization;
+
 namespace FocusFlow.Console;
 using System;
 
@@ -16,7 +17,6 @@ public class TaskManager
         if (Tasks.Count == 0)
         {
             Console.WriteLine(msg);
-            //Console.WriteLine("No tasks found.");
             return false;
         }
         return true;
@@ -150,13 +150,20 @@ public class TaskManager
 
         return dueDate;
     }
-
-    /* EditTask() still needs work:
-        - Title must not be null
-        - Proper checks of (y/n) - currently allows for no input
-        - Still need to save tasks with DataManager after edits are made
-        - Perhaps more....
-     */
+    
+    public bool CheckYesOrNo(string msg)
+    {
+        while (true)
+        {
+            Console.Write(msg);
+            string userInput = Console.ReadLine().Trim().ToLower();
+            
+            if (userInput == "y" || userInput == "yes") return true;
+            if (userInput == "n" || userInput == "no") return false;
+            
+            Console.WriteLine("\nInvalid input. Please enter 'y' or 'n'.");
+        }
+    }
     public void EditTask()
     {
         if (!CheckForTasks("No tasks to edit.")) return;
@@ -167,9 +174,9 @@ public class TaskManager
             var task = Tasks[index - 1];
 
             var taskStatus = task.IsCompleted ? "[\u2713] Complete" : "[ ] Incomplete";
-            Console.WriteLine($"Task is {taskStatus}");
-            Console.Write("Would you like to edit this status? (y/n): ");
-            if (Console.ReadLine().Trim().ToLower() == "y")
+            Console.WriteLine($"\nTask is {taskStatus}");
+            
+            if (CheckYesOrNo("Would you like to edit this status? (y/n): "))
             {
                 while (true)
                 {
@@ -186,34 +193,45 @@ public class TaskManager
                         task.IsCompleted = false;
                         break;
                     }
-                    
-                    Console.WriteLine("Invalid input. Please try again.");
+                    Console.WriteLine("\nInvalid input. Please try again.");
                 }
             }
             
-            Console.WriteLine($"Current title: {task.Title}");
-            Console.Write("Would you like to edit this title? (y/n): ");
-            if (Console.ReadLine().Trim().ToLower() == "y")
+            Console.WriteLine($"\nCurrent title: {task.Title}");
+            if (CheckYesOrNo("Would you like to edit this title? (y/n): "))
             {
-                Console.Write("Enter new title: ");
-                task.Title = Console.ReadLine().Trim();
+                while (true)
+                {
+                    Console.Write("Enter new title: ");
+                    string newTitle = Console.ReadLine().Trim();
+                    if (!string.IsNullOrWhiteSpace(newTitle))
+                    {
+                        task.Title = newTitle;
+                        break;
+                    }
+                    
+                    Console.WriteLine("\nTask title may not be empty. Please try again.");
+                       
+                }
+                
             }
 
-            Console.WriteLine($"Current description: {task.Description}");
-            Console.Write("Would you like to edit this description? (y/n): ");
-            if (Console.ReadLine().Trim().ToLower() == "y")
+            Console.WriteLine($"\nCurrent description: {task.Description}");
+            if (CheckYesOrNo("Would you like to edit this description? (y/n): "))
             {
                 Console.Write("Enter new description: ");
                 task.Description = Console.ReadLine().Trim();
             }
             
-            Console.WriteLine($"Current due date: {task.DueDate?.ToString("MM/dd/yyyy") ?? "No due date"}");
-            Console.Write("Would you like to edit this due date? (y/n): ");
-            if (Console.ReadLine().Trim().ToLower() == "y")
+            Console.WriteLine($"\nCurrent due date: {task.DueDate?.ToString("MM/dd/yyyy") ?? "No due date"}");
+            if (CheckYesOrNo("Would you like to edit this due date? (y/n): "))
             {
                 Console.Write("Enter new date (MM/dd/yyyy): ");
                 task.DueDate = HandleDueDate();
             }
+            
+            DataManager.SaveTasks(Tasks);
+            Console.WriteLine("\nTask updated successfully.");
 
         }
         else
