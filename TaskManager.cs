@@ -53,7 +53,7 @@ public class TaskManager
         DataManager.SaveTasks(Tasks);
     }
 
-    public void ShowTasks()
+    public void ShowTasks(List<TaskItem> showTasks)
     {
         // Task display
         Console.WriteLine("\n---------  Tasks  ---------");
@@ -64,11 +64,11 @@ public class TaskManager
         }
         
         // Loop through tasks and display them
-        for (int i = 0; i < Tasks.Count; i++)
+        for (int i = 0; i < showTasks.Count; i++)
         {
-            var status = Tasks[i].IsCompleted ? "[\u2713] Complete" : "[ ] Incomplete";
-            var dueDateDisplay = Tasks[i].DueDate?.ToString("MM/dd/yyyy") ?? "No due date";
-            Console.WriteLine($"{i + 1}. {status} | {Tasks[i].Title} - {Tasks[i].Description} - (Due: {dueDateDisplay})");
+            var status = showTasks[i].IsCompleted ? "[\u2713] Complete" : "[ ] Incomplete";
+            var dueDateDisplay = showTasks[i].DueDate?.ToString("MM/dd/yyyy") ?? "No due date";
+            Console.WriteLine($"{i + 1}. {status} | {showTasks[i].Title} - {showTasks[i].Description} - (Due: {dueDateDisplay})");
         }
         
         Console.WriteLine();
@@ -237,6 +237,26 @@ public class TaskManager
         else
         {
             Console.WriteLine("\nInvalid task number. Please try again.");
+        }
+    }
+    
+    public void FilterByStatus()
+    {
+        if (!CheckForTasks("No tasks to filter.")) return;
+        
+        List<TaskItem> filterList = DataManager.LoadTasks();
+        Console.WriteLine("Filter tasks by status (complete/incomplete): ");
+        
+        if (Console.ReadLine().Trim().ToLower() == "complete")
+        {
+            for (int i = 0; i < filterList.Count; i++)
+            {
+                if (!filterList[i].IsCompleted)
+                {
+                    filterList.RemoveAt(i);
+                }
+            }
+            ShowTasks(filterList);
         }
     }
     
