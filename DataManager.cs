@@ -7,19 +7,6 @@ public class DataManager
     private const string FileName = "tasks.json";
 
     /// <summary>
-    /// Saves the provided list of tasks to the "tasks.json" file in a readable format.
-    /// </summary>
-    /// <param name="tasks">The list of TaskItem objects to save</param>
-    public static void SaveTasks(List<TaskItem> tasks)
-    {
-        // Convert the task list to a formatted JSON string (with indentation for readability)
-        var json = JsonSerializer.Serialize(tasks, new JsonSerializerOptions { WriteIndented = true });
-
-        // Write the JSON string to the file, overwriting any existing content
-        File.WriteAllText(FileName, json);
-    }
-    
-    /// <summary>
     /// Loads tasks from the "tasks.json" file.
     /// If the file doesn't exist, returns an empty task list.
     /// </summary>
@@ -37,4 +24,18 @@ public class DataManager
         // If deserialization fails or returns null, fallback to an empty list.
         return JsonSerializer.Deserialize<List<TaskItem>>(json) ?? new List<TaskItem>();
     }
+    
+    /// <summary>
+    /// Saves the provided list of tasks to the "tasks.json" file in a readable format.
+    /// </summary>
+    /// <param name="tasks">The list of TaskItem objects to save</param>
+    public static void SaveTasks(List<TaskItem> tasks)
+    {
+        // Convert the task list to a formatted JSON string (with indentation for readability)
+        var json = JsonSerializer.Serialize(tasks, new JsonSerializerOptions { WriteIndented = true });
+
+        // Write the JSON string to the file, overwriting any existing content
+        File.WriteAllText(FileName, json);
+    }
+    
 }
