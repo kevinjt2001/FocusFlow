@@ -18,10 +18,9 @@ public class UI
     {
         Console.WriteLine("Welcome to FocusFlow!");
         TaskManager tm = new TaskManager();
-        tm.ShowTasks(tm.Tasks);
         while (true)
         {
-            
+            tm.ShowTasks(tm.Tasks);
             PrintMenu();
             var userInput = Console.ReadLine()?.Trim();
             
@@ -29,19 +28,15 @@ public class UI
             {
                 case "1":
                     tm.AddTask();
-                    tm.ShowTasks(tm.Tasks);
                     break;
                 case "2":
                     tm.CompleteTask();
-                    tm.ShowTasks(tm.Tasks);
                     break;
                 case "3":
                     tm.DeleteTask();
-                    tm.ShowTasks(tm.Tasks);
                     break;
                 case "4":
                     tm.EditTask();
-                    tm.ShowTasks(tm.Tasks);
                     break;
                 case "5":
                     tm.FilterByStatus();

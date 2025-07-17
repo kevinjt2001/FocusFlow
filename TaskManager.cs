@@ -245,9 +245,10 @@ public class TaskManager
         if (!CheckForTasks("No tasks to filter.")) return;
         
         List<TaskItem> filterList = DataManager.LoadTasks();
-        Console.WriteLine("Filter tasks by status (complete/incomplete): ");
+        Console.Write("Filter tasks by status (complete/incomplete): ");
+        string userInput = Console.ReadLine().Trim().ToLower();
         
-        if (Console.ReadLine().Trim().ToLower() == "complete")
+        if (userInput == "complete")
         {
             for (int i = 0; i < filterList.Count; i++)
             {
@@ -256,8 +257,32 @@ public class TaskManager
                     filterList.RemoveAt(i);
                 }
             }
+            Console.Write("Filtered Tasks: ");
             ShowTasks(filterList);
         }
+        else if (userInput == "incomplete")
+        {
+            for (int i = 0; i < filterList.Count; i++)
+            {
+                if (filterList[i].IsCompleted)
+                {
+                    filterList.RemoveAt(i);
+                }
+            }
+            Console.Write("Filtered Tasks: ");
+            ShowTasks(filterList);
+        }
+        else
+        {
+            Console.WriteLine("Invalid input. Please try again.");
+        }
+        
     }
+    
+    /* Notes for FilterByStatus():
+        - Current logic has bug(s). Filter is not being done correctly (e.g. incomplete tasks are being returned with complete tasks.
+        - Find way to only have to loop through tasks once instead of twice
+        - Find way to only show filtered task list until otherwise specified by user (Clear filter functionality)
+    */
     
 }
