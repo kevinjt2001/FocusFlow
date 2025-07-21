@@ -10,7 +10,8 @@ public class UI
         Console.WriteLine("  3. Delete Task");
         Console.WriteLine("  4. Edit Task");
         Console.WriteLine("  5. Filter Task by Status");
-        Console.WriteLine("  6. Exit Task Manager");
+        Console.WriteLine("  6. Clear Filter");
+        Console.WriteLine("  7. Exit Task Manager");
         Console.Write("> ");
     }
 
@@ -18,9 +19,10 @@ public class UI
     {
         Console.WriteLine("Welcome to FocusFlow!");
         TaskManager tm = new TaskManager();
+        
         while (true)
         {
-            tm.ShowTasks(tm.Tasks);
+            tm.ShowTasks();
             PrintMenu();
             var userInput = Console.ReadLine()?.Trim();
             
@@ -39,9 +41,13 @@ public class UI
                     tm.EditTask();
                     break;
                 case "5":
-                    tm.FilterByStatus();
+                    Console.Write("Filter tasks by status (complete/incomplete): ");
+                    tm.FilterByStatus(Console.ReadLine().Trim().ToLower());
                     break;
                 case "6":
+                    tm.ClearFilter();
+                    break;
+                case "7":
                     Console.Write("\nGoodbye!");
                     return; // exit 
                 default:

@@ -6,6 +6,7 @@ using System;
 public class TaskManager
 {
     public List<TaskItem> Tasks { get; set; }
+    private string? CurrentFilter = null;
 
     public TaskManager()
     {
@@ -53,22 +54,31 @@ public class TaskManager
         DataManager.SaveTasks(Tasks);
     }
 
-    public void ShowTasks(List<TaskItem> showTasks)
+    public void ShowTasks()
     {
+        List<TaskItem> tasksToShow = string.IsNullOrEmpty(CurrentFilter)
+            ? Tasks
+            : Tasks.Where(t => CurrentFilter == "complete" ? t.IsCompleted : !t.IsCompleted).ToList();
+        
         // Task display
         Console.WriteLine("\n---------  Tasks  ---------");
-        if (!CheckForTasks("No tasks yet."))
+        if (!tasksToShow.Any())
         {
-            Console.WriteLine();
+            Console.WriteLine("No tasks to display.");
             return;
+        }
+
+        if (!string.IsNullOrEmpty(CurrentFilter))
+        {
+            Console.WriteLine($"(Filter applied: Showing only {CurrentFilter} tasks.)");
         }
         
         // Loop through tasks and display them
-        for (int i = 0; i < showTasks.Count; i++)
+        for (int i = 0; i < tasksToShow.Count; i++)
         {
-            var status = showTasks[i].IsCompleted ? "[\u2713] Complete" : "[ ] Incomplete";
-            var dueDateDisplay = showTasks[i].DueDate?.ToString("MM/dd/yyyy") ?? "No due date";
-            Console.WriteLine($"{i + 1}. {status} | {showTasks[i].Title} - {showTasks[i].Description} - (Due: {dueDateDisplay})");
+            var status = tasksToShow[i].IsCompleted ? "[\u2713] Complete  " : "[ ] Incomplete";
+            var dueDateDisplay = tasksToShow[i].DueDate?.ToString("MM/dd/yyyy") ?? "No due date";
+            Console.WriteLine($"{i + 1}. {status} | {tasksToShow[i].Title} - {tasksToShow[i].Description} - (Due: {dueDateDisplay})");
         }
         
         Console.WriteLine();
@@ -173,7 +183,7 @@ public class TaskManager
         {
             var task = Tasks[index - 1];
 
-            var taskStatus = task.IsCompleted ? "[\u2713] Complete" : "[ ] Incomplete";
+            var taskStatus = task.IsCompleted ? "[\u2713] Complete  " : "[ ] Incomplete";
             Console.WriteLine($"\nTask is {taskStatus}");
             
             if (CheckYesOrNo("Would you like to edit this status? (y/n): "))
@@ -240,49 +250,22 @@ public class TaskManager
         }
     }
     
-    public void FilterByStatus()
+    public void FilterByStatus(string status)
     {
         if (!CheckForTasks("No tasks to filter.")) return;
         
-        List<TaskItem> filterList = DataManager.LoadTasks();
-        Console.Write("Filter tasks by status (complete/incomplete): ");
-        string userInput = Console.ReadLine().Trim().ToLower();
-        
-        if (userInput == "complete")
+        if (status == "complete" || status == "incomplete")
         {
-            for (int i = 0; i < filterList.Count; i++)
-            {
-                if (!filterList[i].IsCompleted)
-                {
-                    filterList.RemoveAt(i);
-                }
-            }
-            Console.Write("Filtered Tasks: ");
-            ShowTasks(filterList);
-        }
-        else if (userInput == "incomplete")
-        {
-            for (int i = 0; i < filterList.Count; i++)
-            {
-                if (filterList[i].IsCompleted)
-                {
-                    filterList.RemoveAt(i);
-                }
-            }
-            Console.Write("Filtered Tasks: ");
-            ShowTasks(filterList);
-        }
-        else
-        {
-            Console.WriteLine("Invalid input. Please try again.");
+            CurrentFilter = status;
+            return;
         }
         
+        Console.WriteLine("Invalid filter input. Please enter 'complete' or 'incomplete' to filter tasks by status.");
     }
-    
-    /* Notes for FilterByStatus():
-        - Current logic has bug(s). Filter is not being done correctly (e.g. incomplete tasks are being returned with complete tasks.
-        - Find way to only have to loop through tasks once instead of twice
-        - Find way to only show filtered task list until otherwise specified by user (Clear filter functionality)
-    */
-    
+
+    public void ClearFilter()
+    {
+        CurrentFilter = null;
+        Console.WriteLine("Task filter cleared. Showing all tasks.");
+    }
 }
