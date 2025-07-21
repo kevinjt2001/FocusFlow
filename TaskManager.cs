@@ -6,6 +6,7 @@ using System;
 public class TaskManager
 {
     public List<TaskItem> Tasks { get; set; }
+    private string? CurrentFilter = null;
 
     public TaskManager()
     {
@@ -55,20 +56,29 @@ public class TaskManager
 
     public void ShowTasks()
     {
+        List<TaskItem> tasksToShow = string.IsNullOrEmpty(CurrentFilter)
+            ? Tasks
+            : Tasks.Where(t => CurrentFilter == "complete" ? t.IsCompleted : !t.IsCompleted).ToList();
+        
         // Task display
         Console.WriteLine("\n---------  Tasks  ---------");
-        if (!CheckForTasks("No tasks yet."))
+        if (!tasksToShow.Any())
         {
-            Console.WriteLine();
+            Console.WriteLine("No tasks to display.");
             return;
+        }
+
+        if (!string.IsNullOrEmpty(CurrentFilter))
+        {
+            Console.WriteLine($"(Filter applied: Showing only {CurrentFilter} tasks.)");
         }
         
         // Loop through tasks and display them
-        for (int i = 0; i < Tasks.Count; i++)
+        for (int i = 0; i < tasksToShow.Count; i++)
         {
-            var status = Tasks[i].IsCompleted ? "[\u2713] Complete" : "[ ] Incomplete";
-            var dueDateDisplay = Tasks[i].DueDate?.ToString("MM/dd/yyyy") ?? "No due date";
-            Console.WriteLine($"{i + 1}. {status} | {Tasks[i].Title} - {Tasks[i].Description} - (Due: {dueDateDisplay})");
+            var status = tasksToShow[i].IsCompleted ? "[\u2713] Complete  " : "[ ] Incomplete";
+            var dueDateDisplay = tasksToShow[i].DueDate?.ToString("MM/dd/yyyy") ?? "No due date";
+            Console.WriteLine($"{i + 1}. {status} | {tasksToShow[i].Title} - {tasksToShow[i].Description} - (Due: {dueDateDisplay})");
         }
         
         Console.WriteLine();
@@ -173,7 +183,7 @@ public class TaskManager
         {
             var task = Tasks[index - 1];
 
-            var taskStatus = task.IsCompleted ? "[\u2713] Complete" : "[ ] Incomplete";
+            var taskStatus = task.IsCompleted ? "[\u2713] Complete  " : "[ ] Incomplete";
             Console.WriteLine($"\nTask is {taskStatus}");
             
             if (CheckYesOrNo("Would you like to edit this status? (y/n): "))
@@ -240,4 +250,22 @@ public class TaskManager
         }
     }
     
+    public void FilterByStatus(string status)
+    {
+        if (!CheckForTasks("No tasks to filter.")) return;
+        
+        if (status == "complete" || status == "incomplete")
+        {
+            CurrentFilter = status;
+            return;
+        }
+        
+        Console.WriteLine("Invalid filter input. Please enter 'complete' or 'incomplete' to filter tasks by status.");
+    }
+
+    public void ClearFilter()
+    {
+        CurrentFilter = null;
+        Console.WriteLine("Task filter cleared. Showing all tasks.");
+    }
 }
