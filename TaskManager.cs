@@ -23,6 +23,12 @@ public class TaskManager
         return true;
     }
     
+    public void ClearFilter()
+    {
+        CurrentFilter = null;
+        Console.WriteLine("Task filter cleared. Showing all tasks.");
+    }
+    
     public void AddTask()
     {
         Console.Write("Enter task title: ");
@@ -54,17 +60,17 @@ public class TaskManager
         DataManager.SaveTasks(Tasks);
     }
 
-    public void ShowTasks()
+    public void ShowTasks(List<TaskItem> tasks)
     {
         List<TaskItem> tasksToShow = string.IsNullOrEmpty(CurrentFilter)
-            ? Tasks
-            : Tasks.Where(t => CurrentFilter == "complete" ? t.IsCompleted : !t.IsCompleted).ToList();
+            ? tasks
+            : tasks.Where(t => CurrentFilter == "complete" ? t.IsCompleted : !t.IsCompleted).ToList();
         
         // Task display
         Console.WriteLine("\n---------  Tasks  ---------");
         if (!tasksToShow.Any())
         {
-            Console.WriteLine("No tasks to display.");
+            Console.WriteLine("No tasks to display.\n");
             return;
         }
 
@@ -125,7 +131,7 @@ public class TaskManager
         }
     }
     
-    // Method to handle DueDate
+    // Method to validate DueDate
     public DateTime? ValidateDueDate(string userDate)
     {
         // Handle user input for due date. Due date can be null 
@@ -250,9 +256,12 @@ public class TaskManager
         }
     }
     
-    public void FilterByStatus(string status)
+    public void FilterByStatus()
     {
         if (!CheckForTasks("No tasks to filter.")) return;
+        
+        Console.Write("Filter tasks by status (complete/incomplete): ");
+        string status = Console.ReadLine().Trim().ToLower();
         
         if (status == "complete" || status == "incomplete")
         {
@@ -263,9 +272,22 @@ public class TaskManager
         Console.WriteLine("Invalid filter input. Please enter 'complete' or 'incomplete' to filter tasks by status.");
     }
 
-    public void ClearFilter()
+    public void SortByDueDate()
     {
-        CurrentFilter = null;
-        Console.WriteLine("Task filter cleared. Showing all tasks.");
+        Console.WriteLine("Sort tasks by due date (ascending/descending): ");
+        string sort = Console.ReadLine().Trim().ToLower();
+
+        if (sort == "ascending" || sort == "asc")
+        {
+            List<TaskItem> sortedAscending = Tasks.OrderBy(t => t.DueDate).ToList();
+            ShowTasks(sortedAscending);
+        }
+        
+        if (sort == "descending" || sort == "desc")
+        {
+            List<TaskItem> sortedDescending = Tasks.OrderByDescending(t => t.DueDate).ToList();
+        }
+        
+        Console.WriteLine("Invalid sort input. Please enter 'ascending' or 'descending' to sort tasks by due date.");
     }
 }
