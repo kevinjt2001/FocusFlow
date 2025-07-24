@@ -12,7 +12,8 @@ public class UI
         Console.WriteLine("  5. Filter Tasks by Status");
         Console.WriteLine("  6. Clear Filter");
         Console.WriteLine("  7. Sort Tasks by Due Date");
-        Console.WriteLine("  8. Exit Task Manager");
+        Console.WriteLine("  8. Clear Task Sort");
+        Console.WriteLine("  9. Exit Task Manager");
         Console.Write("> ");
     }
 
@@ -23,7 +24,7 @@ public class UI
         
         while (true)
         {
-            tm.ShowTasks(tm.Tasks);
+            tm.ShowTasks();
             PrintMenu();
             var userInput = Console.ReadLine()?.Trim();
             
@@ -51,6 +52,9 @@ public class UI
                     tm.SortByDueDate();
                     break;
                 case "8":
+                    tm.ClearSort();
+                    break;
+                case "9":
                     Console.Write("\nGoodbye!");
                     return; // exit 
                 default:

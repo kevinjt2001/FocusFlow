@@ -7,6 +7,7 @@ public class TaskManager
 {
     public List<TaskItem> Tasks { get; set; }
     private string? CurrentFilter = null;
+    private string? SortOrder = null;
 
     public TaskManager()
     {
@@ -27,6 +28,12 @@ public class TaskManager
     {
         CurrentFilter = null;
         Console.WriteLine("Task filter cleared. Showing all tasks.");
+    }
+
+    public void ClearSort()
+    {
+        SortOrder = null;
+        Console.WriteLine("Task sort cleared. Showing all tasks.");
     }
     
     public void AddTask()
@@ -60,15 +67,25 @@ public class TaskManager
         DataManager.SaveTasks(Tasks);
     }
 
-    public void ShowTasks(List<TaskItem> tasks)
+    public void ShowTasks()
     {
-        List<TaskItem> tasksToShow = string.IsNullOrEmpty(CurrentFilter)
-            ? tasks
-            : tasks.Where(t => CurrentFilter == "complete" ? t.IsCompleted : !t.IsCompleted).ToList();
+        // Apply filter first
+        var filteredTasks = string.IsNullOrEmpty(CurrentFilter)
+            ? Tasks
+            : Tasks.Where(t => CurrentFilter == "complete" ? t.IsCompleted : !t.IsCompleted);
+        
+        // Apply sort
+        if (SortOrder == "ascending")
+            filteredTasks = filteredTasks.OrderBy(t => t.DueDate ?? DateTime.MaxValue); // nulls last
+        else if (SortOrder == "descending")
+            filteredTasks = filteredTasks.OrderByDescending(t => t.DueDate ?? DateTime.MinValue); // nulls last
+
+        var finalList = filteredTasks.ToList();
+        
         
         // Task display
         Console.WriteLine("\n---------  Tasks  ---------");
-        if (!tasksToShow.Any())
+        if (!finalList.Any())
         {
             Console.WriteLine("No tasks to display.\n");
             return;
@@ -78,13 +95,18 @@ public class TaskManager
         {
             Console.WriteLine($"(Filter applied: Showing only {CurrentFilter} tasks.)");
         }
+
+        if (!string.IsNullOrEmpty(SortOrder))
+        {
+            Console.WriteLine($"(Tasks sorted by due date: {SortOrder})");
+        }
         
         // Loop through tasks and display them
-        for (int i = 0; i < tasksToShow.Count; i++)
+        for (int i = 0; i < finalList.Count; i++)
         {
-            var status = tasksToShow[i].IsCompleted ? "[\u2713] Complete  " : "[ ] Incomplete";
-            var dueDateDisplay = tasksToShow[i].DueDate?.ToString("MM/dd/yyyy") ?? "No due date";
-            Console.WriteLine($"{i + 1}. {status} | {tasksToShow[i].Title} - {tasksToShow[i].Description} - (Due: {dueDateDisplay})");
+            var status = finalList[i].IsCompleted ? "[\u2713] Complete  " : "[ ] Incomplete";
+            var dueDateDisplay = finalList[i].DueDate?.ToString("MM/dd/yyyy") ?? "No due date";
+            Console.WriteLine($"{i + 1}. {status} | {finalList[i].Title} - {finalList[i].Description} - (Due: {dueDateDisplay})");
         }
         
         Console.WriteLine();
@@ -274,20 +296,17 @@ public class TaskManager
 
     public void SortByDueDate()
     {
-        Console.WriteLine("Sort tasks by due date (ascending/descending): ");
+        if (!CheckForTasks("No tasks to sort.")) return;
+        
+        Console.Write("Sort tasks by due date (ascending/descending): ");
         string sort = Console.ReadLine().Trim().ToLower();
 
-        if (sort == "ascending" || sort == "asc")
+        if (sort == "ascending" || sort == "descending")
         {
-            List<TaskItem> sortedAscending = Tasks.OrderBy(t => t.DueDate).ToList();
-            ShowTasks(sortedAscending);
+            SortOrder = sort;
+            return;
         }
-        
-        if (sort == "descending" || sort == "desc")
-        {
-            List<TaskItem> sortedDescending = Tasks.OrderByDescending(t => t.DueDate).ToList();
-        }
-        
+            
         Console.WriteLine("Invalid sort input. Please enter 'ascending' or 'descending' to sort tasks by due date.");
     }
 }
