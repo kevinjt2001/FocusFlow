@@ -9,9 +9,11 @@ public class UI
         Console.WriteLine("  2. Mark Task as Complete");
         Console.WriteLine("  3. Delete Task");
         Console.WriteLine("  4. Edit Task");
-        Console.WriteLine("  5. Filter Task by Status");
+        Console.WriteLine("  5. Filter Tasks by Status");
         Console.WriteLine("  6. Clear Filter");
-        Console.WriteLine("  7. Exit Task Manager");
+        Console.WriteLine("  7. Sort Tasks by Due Date");
+        Console.WriteLine("  8. Clear Task Sort");
+        Console.WriteLine("  9. Exit Task Manager");
         Console.Write("> ");
     }
 
@@ -41,13 +43,18 @@ public class UI
                     tm.EditTask();
                     break;
                 case "5":
-                    Console.Write("Filter tasks by status (complete/incomplete): ");
-                    tm.FilterByStatus(Console.ReadLine().Trim().ToLower());
+                    tm.FilterByStatus();
                     break;
                 case "6":
                     tm.ClearFilter();
                     break;
                 case "7":
+                    tm.SortByDueDate();
+                    break;
+                case "8":
+                    tm.ClearSort();
+                    break;
+                case "9":
                     Console.Write("\nGoodbye!");
                     return; // exit 
                 default:

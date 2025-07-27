@@ -6,11 +6,14 @@ using System;
 public class TaskManager
 {
     public List<TaskItem> Tasks { get; set; }
+    public List<TaskItem> VisibleTasks { get; set; }
     private string? CurrentFilter = null;
+    private string? SortOrder = null;
 
     public TaskManager()
     {
         Tasks = DataManager.LoadTasks();
+        VisibleTasks = new List<TaskItem>(Tasks);
     }
 
     public bool CheckForTasks(string msg)
@@ -21,6 +24,18 @@ public class TaskManager
             return false;
         }
         return true;
+    }
+    
+    public void ClearFilter()
+    {
+        CurrentFilter = null;
+        Console.WriteLine("Task filter cleared. Showing all tasks.");
+    }
+
+    public void ClearSort()
+    {
+        SortOrder = null;
+        Console.WriteLine("Task sort cleared. Showing all tasks.");
     }
     
     public void AddTask()
@@ -56,29 +71,44 @@ public class TaskManager
 
     public void ShowTasks()
     {
-        List<TaskItem> tasksToShow = string.IsNullOrEmpty(CurrentFilter)
+        // Apply filter first
+        var filteredTasks = string.IsNullOrEmpty(CurrentFilter)
             ? Tasks
             : Tasks.Where(t => CurrentFilter == "complete" ? t.IsCompleted : !t.IsCompleted).ToList();
         
+        // Apply sort
+        if (!string.IsNullOrEmpty(SortOrder))
+        {
+            filteredTasks = SortOrder == "oldest"
+                ? filteredTasks.OrderBy(t => t.DueDate ?? DateTime.MaxValue).ToList()
+                : filteredTasks.OrderByDescending(t => t.DueDate ?? DateTime.MinValue).ToList();
+        }
+
+        VisibleTasks = filteredTasks;
+        
+        
         // Task display
         Console.WriteLine("\n---------  Tasks  ---------");
-        if (!tasksToShow.Any())
+        if (!filteredTasks.Any())
         {
-            Console.WriteLine("No tasks to display.");
+            Console.WriteLine("No tasks to display.\n");
             return;
         }
 
         if (!string.IsNullOrEmpty(CurrentFilter))
-        {
             Console.WriteLine($"(Filter applied: Showing only {CurrentFilter} tasks.)");
-        }
+        
+
+        if (!string.IsNullOrEmpty(SortOrder))
+            Console.WriteLine($"(Tasks sorted by due date: {SortOrder})");
+        
         
         // Loop through tasks and display them
-        for (int i = 0; i < tasksToShow.Count; i++)
+        for (int i = 0; i < filteredTasks.Count; i++)
         {
-            var status = tasksToShow[i].IsCompleted ? "[\u2713] Complete  " : "[ ] Incomplete";
-            var dueDateDisplay = tasksToShow[i].DueDate?.ToString("MM/dd/yyyy") ?? "No due date";
-            Console.WriteLine($"{i + 1}. {status} | {tasksToShow[i].Title} - {tasksToShow[i].Description} - (Due: {dueDateDisplay})");
+            var status = filteredTasks[i].IsCompleted ? "[\u2713] Complete  " : "[ ] Incomplete";
+            var dueDateDisplay = filteredTasks[i].DueDate?.ToString("MM/dd/yyyy") ?? "No due date";
+            Console.WriteLine($"{i + 1}. {status} | {filteredTasks[i].Title} - {filteredTasks[i].Description} - (Due: {dueDateDisplay})");
         }
         
         Console.WriteLine();
@@ -90,13 +120,15 @@ public class TaskManager
             
         // Mark task complete by task number (index)
         Console.Write("Enter task number to complete: ");
-        if (int.TryParse(Console.ReadLine(), out int index) && index >= 1 && index <= Tasks.Count)
+        if (int.TryParse(Console.ReadLine(), out int index) && index >= 1 && index <= VisibleTasks.Count)
         {
-            if (Tasks[index - 1].IsCompleted)
+            var selectedTask = VisibleTasks[index - 1];
+            if (selectedTask.IsCompleted)
             {
                 Console.WriteLine("\nTask is already complete.");
+                return;
             }
-            Tasks[index - 1].IsCompleted = true;
+            selectedTask.IsCompleted = true;
         }
         else
         {
@@ -111,10 +143,10 @@ public class TaskManager
         
         // Delete task by number (index)
         Console.Write("Enter task number to delete: ");
-        if (int.TryParse(Console.ReadLine(), out int index) && index >= 1 && index <= Tasks.Count)
+        if (int.TryParse(Console.ReadLine(), out int index) && index >= 1 && index <= VisibleTasks.Count)
         {
-            var deletedTask = Tasks[index - 1];
-            Tasks.RemoveAt(index - 1);
+            var deletedTask = VisibleTasks[index - 1];
+            Tasks.Remove(deletedTask);
             Console.WriteLine($"Task deleted: {deletedTask.Title}");
             // Update tasks.json
             DataManager.SaveTasks(Tasks);
@@ -125,7 +157,7 @@ public class TaskManager
         }
     }
     
-    // Method to handle DueDate
+    // Method to validate DueDate
     public DateTime? ValidateDueDate(string userDate)
     {
         // Handle user input for due date. Due date can be null 
@@ -179,9 +211,9 @@ public class TaskManager
         if (!CheckForTasks("No tasks to edit.")) return;
         
         Console.Write("Enter task number to edit: ");
-        if (int.TryParse(Console.ReadLine(), out int index) && index >= 1 && index <= Tasks.Count)
+        if (int.TryParse(Console.ReadLine(), out int index) && index >= 1 && index <= VisibleTasks.Count)
         {
-            var task = Tasks[index - 1];
+            var task = VisibleTasks[index - 1];
 
             var taskStatus = task.IsCompleted ? "[\u2713] Complete  " : "[ ] Incomplete";
             Console.WriteLine($"\nTask is {taskStatus}");
@@ -250,9 +282,12 @@ public class TaskManager
         }
     }
     
-    public void FilterByStatus(string status)
+    public void FilterByStatus()
     {
         if (!CheckForTasks("No tasks to filter.")) return;
+        
+        Console.Write("Filter tasks by status (complete/incomplete): ");
+        string status = Console.ReadLine().Trim().ToLower();
         
         if (status == "complete" || status == "incomplete")
         {
@@ -263,9 +298,19 @@ public class TaskManager
         Console.WriteLine("Invalid filter input. Please enter 'complete' or 'incomplete' to filter tasks by status.");
     }
 
-    public void ClearFilter()
+    public void SortByDueDate()
     {
-        CurrentFilter = null;
-        Console.WriteLine("Task filter cleared. Showing all tasks.");
+        if (!CheckForTasks("No tasks to sort.")) return;
+        
+        Console.Write("Sort tasks by due date (oldest/newest): ");
+        string sort = Console.ReadLine().Trim().ToLower();
+
+        if (sort == "oldest" || sort == "newest")
+        {
+            SortOrder = sort;
+            return;
+        }
+            
+        Console.WriteLine("Invalid sort input. Please enter 'oldest' or 'newest' to sort tasks by due date.");
     }
 }
