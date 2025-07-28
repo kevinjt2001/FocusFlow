@@ -151,10 +151,13 @@ public class TaskManager
         if (int.TryParse(Console.ReadLine(), out int index) && index >= 1 && index <= VisibleTasks.Count)
         {
             var deletedTask = VisibleTasks[index - 1];
-            Tasks.Remove(deletedTask);
-            Console.WriteLine($"Task deleted: {deletedTask.Title}");
-            // Update tasks.json
-            DataManager.SaveTasks(Tasks);
+            if (CheckYesOrNo($"Are you sure you want to delete this task, ({deletedTask.Title})? (y/n): "))
+            {
+                Tasks.Remove(deletedTask);
+                Console.WriteLine($"Task deleted: {deletedTask.Title}");
+                // Update tasks.json
+                DataManager.SaveTasks(Tasks);
+            }
         }
         else
         {
