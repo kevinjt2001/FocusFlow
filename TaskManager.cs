@@ -63,6 +63,10 @@ public class TaskManager
             // Get user input for DueDate and validate it. DueDate can be null.
             Console.Write("Enter task due date (optional, MM/dd/yyyy): ");
             task.DueDate = HandleDueDate();
+
+            // Get user input for task priority and validate it. Priority cannot be null. 
+            string priority = ValidatePriority();
+            task.Priority = priority;
             
             Tasks.Add(task);
         }
@@ -108,7 +112,8 @@ public class TaskManager
         {
             var status = filteredTasks[i].IsCompleted ? "[\u2713] Complete  " : "[ ] Incomplete";
             var dueDateDisplay = filteredTasks[i].DueDate?.ToString("MM/dd/yyyy") ?? "No due date";
-            Console.WriteLine($"{i + 1}. {status} | {filteredTasks[i].Title} - {filteredTasks[i].Description} - (Due: {dueDateDisplay})");
+            var priority = filteredTasks[i].Priority ?? "No priority";
+            Console.WriteLine($"{i + 1}. {status} | {filteredTasks[i].Title} - {filteredTasks[i].Description} - (Due: {dueDateDisplay}) - (Priority: {priority})");
         }
         
         Console.WriteLine();
@@ -206,6 +211,32 @@ public class TaskManager
             Console.WriteLine("\nInvalid input. Please enter 'y' or 'n'.");
         }
     }
+
+    public string ValidatePriority()
+    {
+        while (true)
+        {
+            Console.Write("Enter task priority (low/medium/high): ");
+            string priority = Console.ReadLine().Trim().ToLower();
+            
+            if (priority == "low" || priority == "medium" || priority == "high")
+            {
+                return priority;
+            }
+            
+            if (string.IsNullOrWhiteSpace(priority))
+            {
+                Console.WriteLine("\nTask priority may not be empty. Please try again (low/medium/high).");
+            }
+
+            else
+            {
+                Console.WriteLine("\nInvalid task priority. Please try again (low/medium/high).");
+            }
+        }
+        
+    }
+    
     public void EditTask()
     {
         if (!CheckForTasks("No tasks to edit.")) return;
@@ -251,11 +282,9 @@ public class TaskManager
                         task.Title = newTitle;
                         break;
                     }
-                    
+
                     Console.WriteLine("\nTask title may not be empty. Please try again.");
-                       
                 }
-                
             }
 
             Console.WriteLine($"\nCurrent description: {task.Description}");
@@ -272,9 +301,15 @@ public class TaskManager
                 task.DueDate = HandleDueDate();
             }
             
+            Console.WriteLine($"\nCurrent priority: {task.Priority}");
+            if (CheckYesOrNo("Would you like to edit this priority? (y/n): "))
+            {
+                string priority = ValidatePriority();
+                task.Priority = priority;
+            }
+            
             DataManager.SaveTasks(Tasks);
             Console.WriteLine("\nTask updated successfully.");
-
         }
         else
         {

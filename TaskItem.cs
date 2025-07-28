@@ -9,5 +9,6 @@ public class TaskItem
     public string Description { get; set; } = "No description";
     public bool IsCompleted { get; set; }
     public DateTime? DueDate { get; set; }
+    public string? Priority { get; set; }
 
 }
