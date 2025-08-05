@@ -1,5 +1,5 @@
-namespace FocusFlow;
-using System;  
+namespace FocusFlow.ConsoleApp;
+
 public class UI
 {
     public static void PrintMenu()

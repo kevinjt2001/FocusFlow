@@ -1,6 +1,6 @@
 
-namespace FocusFlow;
-using System;
+namespace FocusFlow.ConsoleApp;
+
 public class TaskItem
 {
     public required string Title { get; set; }
