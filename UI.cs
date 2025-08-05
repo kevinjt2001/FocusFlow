@@ -1,4 +1,4 @@
-namespace FocusFlow.Console;
+namespace FocusFlow;
 using System;  
 public class UI
 {

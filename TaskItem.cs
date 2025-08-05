@@ -1,7 +1,5 @@
-using System.Globalization;
-using System.Net;
 
-namespace FocusFlow.Console;
+namespace FocusFlow;
 using System;
 public class TaskItem
 {

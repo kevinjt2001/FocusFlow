@@ -1,6 +1,6 @@
 using System.Globalization;
 
-namespace FocusFlow.Console;
+namespace FocusFlow;
 using System;
 
 public class TaskManager
