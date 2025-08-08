@@ -16,9 +16,7 @@ public class TaskManager
         Tasks = _dataManager.LoadTasks();
         VisibleTasks = new List<TaskItem>(Tasks);
     }
-
-    public bool HasTasks => Tasks.Count > 0;
-
+    
     public void ClearFilter() => CurrentFilter = null;
 
     public void ClearSort() => SortOrder = null;
