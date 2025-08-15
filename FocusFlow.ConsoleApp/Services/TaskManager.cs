@@ -9,8 +9,8 @@ public class TaskManager
     private readonly IDataManager _dataManager;
     public List<TaskItem> Tasks { get; set; }
     public List<TaskItem> VisibleTasks { get; private set; }
-    private string? _currentFilter = null;
-    private string? _sortOrder = null;
+    private string? _currentFilter;
+    private string? _sortOrder;
 
     public TaskManager(IDataManager dataManager)
     {
@@ -21,8 +21,13 @@ public class TaskManager
 
     public List<TaskItem> GetAllTasks() => Tasks;
     public void ClearFilter() => _currentFilter = null;
-
     public void ClearSort() => _sortOrder = null;
+    private bool IsValidIndex(int index) => index >= 1 && index <= VisibleTasks.Count;
+
+    public TaskItem? GetTaskByID(Guid taskID)
+    {
+        return Tasks.FirstOrDefault(t => t.TaskID == taskID);
+    }
 
     public bool AddTask(string title, string? description, DateTime? dueDate, string priority)
     {
@@ -149,5 +154,5 @@ public class TaskManager
         VisibleTasks = filtered;
     }
 
-    private bool IsValidIndex(int index) => index >= 1 && index <= VisibleTasks.Count;
+    
 }

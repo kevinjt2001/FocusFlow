@@ -14,11 +14,22 @@ public class NoteManager
 
     public List<NoteItem> GetAllNotes() => _notes;
 
-    public NoteItem CreateNote(string title, string? content, Guid? linkedTaskID)
+    public NoteItem CreateStandaloneNote(string title, string? content)
     {
-        if (linkedTaskID.HasValue && !_taskManager.GetAllTasks().Any(t => t.ID == linkedTaskID.Value))
+        return CreateNote(title, content, null);
+    }
+
+    public NoteItem CreateLinkedNote(string title, string? content, Guid linkedTaskID)
+    {
+        if (_taskManager.GetTaskByID(linkedTaskID) == null)
             throw new ArgumentException("Cannot link note to a non-existent task.");
 
+        return CreateNote(title, content, linkedTaskID);
+    }
+    
+
+    public NoteItem CreateNote(string title, string? content, Guid? linkedTaskID)
+    {
         var note = new NoteItem()
         {
             Title = title,
