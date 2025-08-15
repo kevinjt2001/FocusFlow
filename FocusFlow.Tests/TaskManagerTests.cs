@@ -1,4 +1,7 @@
 using FocusFlow.ConsoleApp;
+using FocusFlow.ConsoleApp.Data;
+using FocusFlow.ConsoleApp.Models;
+using FocusFlow.ConsoleApp.Services;
 using Moq; 
 
 namespace FocusFlow.Tests

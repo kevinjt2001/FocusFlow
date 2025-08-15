@@ -1,6 +1,7 @@
-using System;
+using FocusFlow.ConsoleApp.Data;
+using FocusFlow.ConsoleApp.Services;
 
-namespace FocusFlow.ConsoleApp;
+namespace FocusFlow.ConsoleApp.UI;
 
 public class UI
 {

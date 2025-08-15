@@ -5,7 +5,7 @@ namespace FocusFlow.ConsoleApp
     {
         public static void Main(string[] args)
         {
-            UI.Loop();
+            UI.UI.Loop();
         }
     }
 }

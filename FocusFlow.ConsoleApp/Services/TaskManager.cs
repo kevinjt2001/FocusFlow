@@ -1,6 +1,8 @@
 using System.Globalization;
+using FocusFlow.ConsoleApp.Data;
+using FocusFlow.ConsoleApp.Models;
 
-namespace FocusFlow.ConsoleApp;
+namespace FocusFlow.ConsoleApp.Services;
 
 public class TaskManager
 {
