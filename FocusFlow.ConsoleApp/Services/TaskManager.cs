@@ -9,8 +9,8 @@ public class TaskManager
     private readonly IDataManager _dataManager;
     public List<TaskItem> Tasks { get; set; }
     public List<TaskItem> VisibleTasks { get; private set; }
-    private string? CurrentFilter = null;
-    private string? SortOrder = null;
+    private string? _currentFilter = null;
+    private string? _sortOrder = null;
 
     public TaskManager(IDataManager dataManager)
     {
@@ -18,10 +18,11 @@ public class TaskManager
         Tasks = _dataManager.LoadTasks();
         VisibleTasks = new List<TaskItem>(Tasks);
     }
-    
-    public void ClearFilter() => CurrentFilter = null;
 
-    public void ClearSort() => SortOrder = null;
+    public List<TaskItem> GetAllTasks() => Tasks;
+    public void ClearFilter() => _currentFilter = null;
+
+    public void ClearSort() => _sortOrder = null;
 
     public bool AddTask(string title, string? description, DateTime? dueDate, string priority)
     {
@@ -105,7 +106,7 @@ public class TaskManager
     {
         if (status != "complete" && status != "incomplete") return false;
 
-        CurrentFilter = status;
+        _currentFilter = status;
         return true;
     }
 
@@ -113,7 +114,7 @@ public class TaskManager
     {
         if (order != "oldest" && order != "newest") return false;
 
-        SortOrder = order;
+        _sortOrder = order;
         return true;
     }
 
@@ -134,13 +135,13 @@ public class TaskManager
 
     private void ApplyFilterAndSort()
     {
-        var filtered = string.IsNullOrEmpty(CurrentFilter)
+        var filtered = string.IsNullOrEmpty(_currentFilter)
             ? Tasks
-            : Tasks.Where(t => CurrentFilter == "complete" ? t.IsCompleted : !t.IsCompleted).ToList();
+            : Tasks.Where(t => _currentFilter == "complete" ? t.IsCompleted : !t.IsCompleted).ToList();
 
-        if (!string.IsNullOrEmpty(SortOrder))
+        if (!string.IsNullOrEmpty(_sortOrder))
         {
-            filtered = SortOrder == "oldest"
+            filtered = _sortOrder == "oldest"
                 ? filtered.OrderBy(t => t.DueDate ?? DateTime.MaxValue).ToList()
                 : filtered.OrderByDescending(t => t.DueDate ?? DateTime.MinValue).ToList();
         }

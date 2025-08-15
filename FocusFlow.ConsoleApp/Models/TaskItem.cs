@@ -8,5 +8,7 @@ public class TaskItem
     public bool IsCompleted { get; set; }
     public DateTime? DueDate { get; set; }
     public string? Priority { get; set; }
+    
+    public Guid TaskID { get; set; }
 
 }
