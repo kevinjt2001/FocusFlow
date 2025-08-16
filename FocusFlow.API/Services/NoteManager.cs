@@ -5,62 +5,108 @@ namespace FocusFlow.API.Services;
 
 public class NoteManager
 {
-    private readonly List<NoteItem> _notes = new();
-    private readonly TaskManager _taskManager;
-    private readonly NoteDataManager _noteDataManager;
+    private readonly INoteRepository _noteRepository;
+    private readonly ITaskRepository _taskRepository;
 
-    public NoteManager(TaskManager taskManager, NoteDataManager noteDataManager)
+    public NoteManager(INoteRepository noteRepository, ITaskRepository taskRepository)
     {
-        _taskManager = taskManager;
-        _noteDataManager = noteDataManager;
-        _notes = _noteDataManager.LoadNotes();
+        _noteRepository = noteRepository;
+        _taskRepository = taskRepository;
     }
-    public List<NoteItem> GetAllNotes() => _notes;
-    public NoteItem? GetNoteByID(Guid noteID) => _notes.FirstOrDefault(n => n.NoteID == noteID);
-    public List<NoteItem> GetNotesByTask(Guid taskID) => _notes.Where(n => n.LinkedTaskID == taskID).ToList();
-    
-    public NoteItem CreateNote(string title, string? content, Guid? linkedTaskID = null)
+
+    public async Task<List<NoteItem>> GetAllNotesAsync()
     {
-        var note = new NoteItem()
-        {
-            Title = title,
-            Content = content ?? string.Empty,
-            LinkedTaskID = linkedTaskID
-        };
+        return await _noteRepository.GetAllNotesAsync();
+    }
+
+    public async Task<NoteItem?> GetNoteByIdAsync(Guid noteId)
+    {
+        return await _noteRepository.GetNoteByIdAsync(noteId);
+    }
+
+    public async Task<List<NoteItem>> GetNotesByTaskIdAsync(Guid taskId)
+    {
+        return await _noteRepository.GetNotesByTaskIdAsync(taskId);
+    }
+
+    public async Task<NoteItem?> CreateNoteAsync(string title, string? content, Guid? linkedTaskId = null)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            return null;
         
-        _notes.Add(note);
-        _noteDataManager.SaveNotes(_notes);
-        return note;
+        if (linkedTaskId.HasValue)
+        {
+            var task = await _taskRepository.GetTaskByIdAsync(linkedTaskId.Value);
+            if (task == null)
+                return null; 
+        }
+
+        var note = new NoteItem
+        {
+            Title = title.Trim(),
+            Content = content?.Trim() ?? string.Empty,
+            LinkedTaskID = linkedTaskId,
+            CreatedAt = DateTime.UtcNow,
+            UpdatedAt = DateTime.UtcNow
+        };
+
+        return await _noteRepository.AddNoteAsync(note);
     }
 
-    public bool UpdateNote(Guid noteID, string? newTitle = null, string? newContent = null)
+    public async Task<NoteItem?> UpdateNoteAsync(Guid noteId, string? newTitle = null, string? newContent = null, Guid? newLinkedTaskId = null)
     {
-        var note = GetNoteByID(noteID);
-
-        if (note == null)
-            return false;
+        var note = await _noteRepository.GetNoteByIdAsync(noteId);
+        if (note == null) return null;
+        
+        if (newLinkedTaskId.HasValue && newLinkedTaskId != note.LinkedTaskID)
+        {
+            var task = await _taskRepository.GetTaskByIdAsync(newLinkedTaskId.Value);
+            if (task == null)
+                return null; 
+        }
 
         if (!string.IsNullOrWhiteSpace(newTitle))
-            note.Title = newTitle;
+            note.Title = newTitle.Trim();
 
-        if (!string.IsNullOrWhiteSpace(newContent))
-            note.Content = newContent;
-        
-        _noteDataManager.SaveNotes(_notes);
-        return true;
+        if (newContent != null)
+            note.Content = newContent.Trim();
+
+        if (newLinkedTaskId != note.LinkedTaskID)
+            note.LinkedTaskID = newLinkedTaskId;
+
+        note.UpdatedAt = DateTime.UtcNow;
+
+        return await _noteRepository.UpdateNoteAsync(note);
     }
 
-    public bool DeleteNote(Guid noteID)
+    public async Task<bool> DeleteNoteAsync(Guid noteId)
     {
-        var note = GetNoteByID(noteID);
-        
-        if (note == null)
-            return false;
-        
-        _notes.Remove(note);
-        _noteDataManager.SaveNotes(_notes);
+        return await _noteRepository.DeleteNoteAsync(noteId);
+    }
+
+    public async Task<bool> LinkNoteToTaskAsync(Guid noteId, Guid taskId)
+    {
+        var note = await _noteRepository.GetNoteByIdAsync(noteId);
+        var task = await _taskRepository.GetTaskByIdAsync(taskId);
+
+        if (note == null || task == null) return false;
+
+        note.LinkedTaskID = taskId;
+        note.UpdatedAt = DateTime.UtcNow;
+
+        await _noteRepository.UpdateNoteAsync(note);
         return true;
     }
-    
-    
+
+    public async Task<bool> UnlinkNoteFromTaskAsync(Guid noteId)
+    {
+        var note = await _noteRepository.GetNoteByIdAsync(noteId);
+        if (note == null) return false;
+
+        note.LinkedTaskID = null;
+        note.UpdatedAt = DateTime.UtcNow;
+
+        await _noteRepository.UpdateNoteAsync(note);
+        return true;
+    }
 }

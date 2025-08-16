@@ -6,87 +6,70 @@ namespace FocusFlow.API.Services;
 
 public class TaskManager
 {
-    private readonly IDataManager _dataManager;
-    public List<TaskItem> Tasks { get; set; }
-    public List<TaskItem> VisibleTasks { get; private set; }
+    private readonly ITaskRepository _taskRepository;
     private string? _currentFilter;
     private string? _sortOrder;
 
-    public TaskManager(IDataManager dataManager)
+    public TaskManager(ITaskRepository taskRepository)
     {
-        _dataManager = dataManager;
-        Tasks = _dataManager.LoadTasks();
-        VisibleTasks = new List<TaskItem>(Tasks);
+        _taskRepository = taskRepository;
     }
 
-    public List<TaskItem> GetAllTasks() => Tasks;
-    public void ClearFilter() => _currentFilter = null;
-    public void ClearSort() => _sortOrder = null;
-    private bool IsValidIndex(int index) => index >= 1 && index <= VisibleTasks.Count;
-
-    public TaskItem? GetTaskByID(Guid taskID)
+    // Basic CRUD operations
+    public async Task<List<TaskItem>> GetAllTasksAsync()
     {
-        return Tasks.FirstOrDefault(t => t.TaskID == taskID);
+        return await _taskRepository.GetAllTasksAsync();
     }
 
-    public bool AddTask(string title, string? description, DateTime? dueDate, string priority)
+    public async Task<TaskItem?> GetTaskByIdAsync(Guid taskId)
     {
-        if (string.IsNullOrWhiteSpace(title) || string.IsNullOrWhiteSpace(priority))
-            return false;
+        return await _taskRepository.GetTaskByIdAsync(taskId);
+    }
+
+    // Get visible tasks with current filters and sorting applied
+    public async Task<List<TaskItem>> GetVisibleTasksAsync()
+    {
+        bool? completionFilter = _currentFilter switch
+        {
+            "complete" => true,
+            "incomplete" => false,
+            _ => null
+        };
+
+        return await _taskRepository.GetFilteredAndSortedTasksAsync(completionFilter, _sortOrder);
+    }
+
+    public async Task<List<TaskItem>> GetTasksByPriorityAsync(Priority priority)
+    {
+        return await _taskRepository.GetTasksByPriorityAsync(priority);
+    }
+
+    public async Task<List<TaskItem>> GetTasksByCompletionStatusAsync(bool isCompleted)
+    {
+        return await _taskRepository.GetTasksByCompletionStatusAsync(isCompleted);
+    }
+
+    public async Task<TaskItem?> AddTaskAsync(string title, string? description, DateTime? dueDate, Priority priority)
+    {
+        if (string.IsNullOrWhiteSpace(title))
+            return null;
 
         var task = new TaskItem
         {
             Title = title.Trim(),
             Description = string.IsNullOrWhiteSpace(description) ? "No description" : description.Trim(),
             DueDate = dueDate,
-            Priority = priority.Trim().ToLower()
+            Priority = priority
         };
 
-        Tasks.Add(task);
-        _dataManager.SaveTasks(Tasks);
-        return true;
+        return await _taskRepository.AddTaskAsync(task);
     }
 
-    public List<string> GetVisibleTaskDescriptions()
+    public async Task<TaskItem?> UpdateTaskAsync(Guid taskId, string? newTitle = null, string? newDescription = null,
+        DateTime? newDueDate = null, bool? newStatus = null, Priority? newPriority = null)
     {
-        ApplyFilterAndSort();
-        return VisibleTasks.Select(t =>
-        {
-            var status = t.IsCompleted ? "[✓] Complete" : "[ ] Incomplete";
-            var due = t.DueDate?.ToString("MM/dd/yyyy") ?? "No due date";
-            var priority = t.Priority ?? "No priority";
-            return $"{status} | {t.Title} - {t.Description} - (Due: {due}) - (Priority: {priority})";
-        }).ToList();
-    }
-
-    public bool CompleteTask(int index)
-    {
-        if (!IsValidIndex(index)) return false;
-
-        var task = VisibleTasks[index - 1];
-        if (task.IsCompleted) return false;
-
-        task.IsCompleted = true;
-        _dataManager.SaveTasks(Tasks);
-        return true;
-    }
-
-    public bool DeleteTask(int index)
-    {
-        if (!IsValidIndex(index)) return false;
-
-        var task = VisibleTasks[index - 1];
-        Tasks.Remove(task);
-        _dataManager.SaveTasks(Tasks);
-        return true;
-    }
-
-    public bool EditTask(int index, string? newTitle = null, string? newDescription = null,
-        DateTime? newDueDate = null, bool? newStatus = null, string? newPriority = null)
-    {
-        if (!IsValidIndex(index)) return false;
-
-        var task = VisibleTasks[index - 1];
+        var task = await _taskRepository.GetTaskByIdAsync(taskId);
+        if (task == null) return null;
 
         if (!string.IsNullOrWhiteSpace(newTitle))
             task.Title = newTitle.Trim();
@@ -100,30 +83,64 @@ public class TaskManager
         if (newStatus.HasValue)
             task.IsCompleted = newStatus.Value;
 
-        if (!string.IsNullOrWhiteSpace(newPriority))
-            task.Priority = newPriority.Trim().ToLower();
+        if (newPriority.HasValue)
+            task.Priority = newPriority.Value;
 
-        _dataManager.SaveTasks(Tasks);
+        return await _taskRepository.UpdateTaskAsync(task);
+    }
+
+    public async Task<bool> CompleteTaskAsync(Guid taskId)
+    {
+        var task = await _taskRepository.GetTaskByIdAsync(taskId);
+        if (task == null || task.IsCompleted) return false;
+
+        task.IsCompleted = true;
+        await _taskRepository.UpdateTaskAsync(task);
         return true;
     }
 
+    public async Task<bool> DeleteTaskAsync(Guid taskId)
+    {
+        return await _taskRepository.DeleteTaskAsync(taskId);
+    }
+    
     public bool FilterByStatus(string status)
     {
         if (status != "complete" && status != "incomplete") return false;
-
         _currentFilter = status;
         return true;
+    }
+
+    public void ClearFilter()
+    {
+        _currentFilter = null;
     }
 
     public bool SortByDueDate(string order)
     {
         if (order != "oldest" && order != "newest") return false;
-
         _sortOrder = order;
         return true;
     }
 
-    public static DateTime? ParseDueDate(string input)
+    public void ClearSort()
+    {
+        _sortOrder = null;
+    }
+    
+    public async Task<List<string>> GetVisibleTaskDescriptionsAsync()
+    {
+        var tasks = await GetVisibleTasksAsync();
+        return tasks.Select(t =>
+        {
+            var status = t.IsCompleted ? "[✓] Complete" : "[ ] Incomplete";
+            var due = t.DueDate?.ToString("MM/dd/yyyy") ?? "No due date";
+            var priority = t.Priority.ToString();
+            return $"{status} | {t.Title} - {t.Description} - (Due: {due}) - (Priority: {priority})";
+        }).ToList();
+    }
+    
+    public static DateTime? ParseDueDate(string? input)
     {
         if (string.IsNullOrWhiteSpace(input)) return null;
 
@@ -133,26 +150,21 @@ public class TaskManager
             : null;
     }
 
-    public static bool IsValidPriority(string priority)
+    public static Priority? ParsePriority(string? priorityString)
     {
-        return priority is "low" or "medium" or "high";
-    }
+        if (string.IsNullOrWhiteSpace(priorityString)) return null;
 
-    private void ApplyFilterAndSort()
-    {
-        var filtered = string.IsNullOrEmpty(_currentFilter)
-            ? Tasks
-            : Tasks.Where(t => _currentFilter == "complete" ? t.IsCompleted : !t.IsCompleted).ToList();
-
-        if (!string.IsNullOrEmpty(_sortOrder))
+        return priorityString.Trim().ToLower() switch
         {
-            filtered = _sortOrder == "oldest"
-                ? filtered.OrderBy(t => t.DueDate ?? DateTime.MaxValue).ToList()
-                : filtered.OrderByDescending(t => t.DueDate ?? DateTime.MinValue).ToList();
-        }
-
-        VisibleTasks = filtered;
+            "low" => Priority.Low,
+            "medium" => Priority.Medium,
+            "high" => Priority.High,
+            _ => null
+        };
     }
 
-    
+    public static bool IsValidPriority(string? priority)
+    {
+        return ParsePriority(priority).HasValue;
+    }
 }
