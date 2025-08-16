@@ -1,3 +1,4 @@
+using FocusFlow.ConsoleApp.Data;
 using FocusFlow.ConsoleApp.Models;
 
 namespace FocusFlow.ConsoleApp.Services;
@@ -6,29 +7,19 @@ public class NoteManager
 {
     private readonly List<NoteItem> _notes = new();
     private readonly TaskManager _taskManager;
+    private readonly NoteDataManager _noteDataManager;
 
-    public NoteManager(TaskManager taskManager)
+    public NoteManager(TaskManager taskManager, NoteDataManager noteDataManager)
     {
         _taskManager = taskManager;
+        _noteDataManager = noteDataManager;
+        _notes = _noteDataManager.LoadNotes();
     }
-
     public List<NoteItem> GetAllNotes() => _notes;
-
-    public NoteItem CreateStandaloneNote(string title, string? content)
-    {
-        return CreateNote(title, content, null);
-    }
-
-    public NoteItem CreateLinkedNote(string title, string? content, Guid linkedTaskID)
-    {
-        if (_taskManager.GetTaskByID(linkedTaskID) == null)
-            throw new ArgumentException("Cannot link note to a non-existent task.");
-
-        return CreateNote(title, content, linkedTaskID);
-    }
+    public NoteItem? GetNoteByID(Guid noteID) => _notes.FirstOrDefault(n => n.NoteID == noteID);
+    public List<NoteItem> GetNotesByTask(Guid taskID) => _notes.Where(n => n.LinkedTaskID == taskID).ToList();
     
-
-    public NoteItem CreateNote(string title, string? content, Guid? linkedTaskID)
+    public NoteItem CreateNote(string title, string? content, Guid? linkedTaskID = null)
     {
         var note = new NoteItem()
         {
@@ -38,7 +29,38 @@ public class NoteManager
         };
         
         _notes.Add(note);
+        _noteDataManager.SaveNotes(_notes);
         return note;
     }
+
+    public bool UpdateNote(Guid noteID, string? newTitle = null, string? newContent = null)
+    {
+        var note = GetNoteByID(noteID);
+
+        if (note == null)
+            return false;
+
+        if (!string.IsNullOrWhiteSpace(newTitle))
+            note.Title = newTitle;
+
+        if (!string.IsNullOrWhiteSpace(newContent))
+            note.Content = newContent;
+        
+        _noteDataManager.SaveNotes(_notes);
+        return true;
+    }
+
+    public bool DeleteNote(Guid noteID)
+    {
+        var note = GetNoteByID(noteID);
+        
+        if (note == null)
+            return false;
+        
+        _notes.Remove(note);
+        _noteDataManager.SaveNotes(_notes);
+        return true;
+    }
+    
     
 }
