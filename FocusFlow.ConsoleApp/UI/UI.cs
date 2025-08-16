@@ -1,5 +1,5 @@
-using FocusFlow.ConsoleApp.Data;
-using FocusFlow.ConsoleApp.Services;
+using FocusFlow.API.Data;
+using FocusFlow.API.Services;
 
 namespace FocusFlow.ConsoleApp.UI;
 
@@ -23,7 +23,7 @@ public class UI
     public static void Loop()
     {
         Console.WriteLine("Welcome to FocusFlow!");
-        IDataManager dataManager = new DataManager();
+        DataManager dataManager = new DataManager();
         TaskManager tm = new TaskManager(dataManager);
 
         while (true)

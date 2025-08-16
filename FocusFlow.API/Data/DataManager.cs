@@ -1,7 +1,7 @@
 using System.Text.Json;
-using FocusFlow.ConsoleApp.Models;
+using FocusFlow.API.Models;
 
-namespace FocusFlow.ConsoleApp.Data;
+namespace FocusFlow.API.Data;
 
 public class DataManager : IDataManager
 {

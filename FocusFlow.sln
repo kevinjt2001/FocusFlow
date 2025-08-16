@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FocusFlow.ConsoleApp", "Foc
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FocusFlow.Tests", "FocusFlow.Tests\FocusFlow.Tests.csproj", "{5FFBC0A5-C8A4-4D04-980D-2FA865A39778}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FocusFlow.API", "FocusFlow.API\FocusFlow.API.csproj", "{95C72015-492A-4005-9FDC-7B4C7217166D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +26,9 @@ Global
 		{5FFBC0A5-C8A4-4D04-980D-2FA865A39778}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5FFBC0A5-C8A4-4D04-980D-2FA865A39778}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5FFBC0A5-C8A4-4D04-980D-2FA865A39778}.Release|Any CPU.Build.0 = Release|Any CPU
+		{95C72015-492A-4005-9FDC-7B4C7217166D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{95C72015-492A-4005-9FDC-7B4C7217166D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{95C72015-492A-4005-9FDC-7B4C7217166D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{95C72015-492A-4005-9FDC-7B4C7217166D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

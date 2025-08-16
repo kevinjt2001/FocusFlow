@@ -1,5 +1,5 @@
 
-namespace FocusFlow.ConsoleApp.Models;
+namespace FocusFlow.API.Models;
 
 public class TaskItem
 {

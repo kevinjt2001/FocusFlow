@@ -1,6 +1,6 @@
-using FocusFlow.ConsoleApp.Models;
+using FocusFlow.API.Models;
 
-namespace FocusFlow.ConsoleApp.Data;
+namespace FocusFlow.API.Data;
 
 public interface IDataManager
 {
